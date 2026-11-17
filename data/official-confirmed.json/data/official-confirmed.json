@@ -1,0 +1,18 @@
+
+{
+  "schema_version": 1,
+  "source": "user_supplied_vietlott_screenshot",
+  "verification_status": "screenshot_confirmed_manual",
+  "draws": [
+    {
+      "draw_id": "0303327",
+      "date": "2026-11-17",
+      "numbers": [3,4,6,9,16,19,28,32,34,40,47,48,49,54,57,62,64,72,73,74]
+    },
+    {
+      "draw_id": "0303328",
+      "date": "2026-11-17",
+      "numbers": [1,2,3,5,8,18,19,24,30,33,35,44,45,48,50,67,69,71,78,80]
+    }
+  ]
+}
