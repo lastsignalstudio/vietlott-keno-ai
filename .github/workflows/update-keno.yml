@@ -1,0 +1,64 @@
+
+name: VIETLOTT KENO AI - Auto Update
+
+on:
+  schedule:
+    - cron: "2-57/5 23,0-14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: keno-auto-update
+  cancel-in-progress: false
+
+jobs:
+  update-keno:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Vietlott collector
+        run: |
+          python -m pip install \
+            "git+https://github.com/NhanAZ-Drops/vietlott-data-research.git@b7a02183162e4ef907fe56dcf56e4cf7139bc4f7"
+
+      - name: Fetch latest Keno results
+        continue-on-error: true
+        run: |
+          vietlott-auto-update \
+            --products keno \
+            --output-dir .cache/keno \
+            --reconcile-pages 2 \
+            --request-delay 2 \
+            --jitter 0.5 \
+            --retries 2 \
+            --timeout 20 \
+            --strict
+
+      - name: Validate and merge Keno data
+        run: python collector/merge_keno.py
+
+      - name: Commit changed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/keno-draws.json
+
+          if git diff --cached --quiet; then
+            echo "No new Keno data."
+          else
+            git commit -m "data: update Keno results"
+            git push origin HEAD:main
+          fi
